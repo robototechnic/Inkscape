@@ -118,35 +118,35 @@ class GcodeExport(inkex.Effect):
 			
 			suffix = ""
 			if self.options.conversion_type == 1:
-				suffix = "_BWfix_"+str(self.options.BW_threshold)+"_"
+				suffix = "_BWfix_"+str(self.options.BW_threshold)
 			elif self.options.conversion_type == 2:
-				suffix = "_BWrnd_"
+				suffix = "_BWrnd"
 			elif self.options.conversion_type == 3:
-				suffix = "_H_"
+				suffix = "_H"
 			elif self.options.conversion_type == 4:
-				suffix = "_Hrow_"
+				suffix = "_Hrow"
 			elif self.options.conversion_type == 5:
-				suffix = "_Hcol_"
+				suffix = "_Hcol"
 			else:
 				if self.options.grayscale_resolution == 1:
-					suffix = "_Gray_256_"
+					suffix = "_Gray_256"
 				elif self.options.grayscale_resolution == 2:
-					suffix = "_Gray_128_"
+					suffix = "_Gray_128"
 				elif self.options.grayscale_resolution == 4:
-					suffix = "_Gray_64_"
+					suffix = "_Gray_64"
 				elif self.options.grayscale_resolution == 8:
-					suffix = "_Gray_32_"
+					suffix = "_Gray_32"
 				elif self.options.grayscale_resolution == 16:
-					suffix = "_Gray_16_"
+					suffix = "_Gray_16"
 				elif self.options.grayscale_resolution == 32:
-					suffix = "_Gray_8_"
+					suffix = "_Gray_8"
 				else:
-					suffix = "_Gray_"
+					suffix = "_Gray"
 				
 			
 			pos_file_png_exported = os.path.join(self.options.directory,self.options.filename+".png") 
-			pos_file_png_BW = os.path.join(self.options.directory,self.options.filename+suffix+"preview.png") 
-			pos_file_gcode = os.path.join(self.options.directory,self.options.filename+suffix+"gcode.txt") 
+			pos_file_png_BW = os.path.join(self.options.directory,self.options.filename+suffix+"_preview.png") 
+			pos_file_gcode = os.path.join(self.options.directory,self.options.filename+suffix+".gcode") 
 			
 
 			#Esporto l'immagine in PNG
