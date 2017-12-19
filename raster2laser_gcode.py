@@ -63,6 +63,11 @@ class GcodeExport(inkex.Effect):
 		self.OptionParser.add_option("","--BW_threshold",action="store", type="int", dest="BW_threshold", default="128",help="") 
 		self.OptionParser.add_option("","--grayscale_resolution",action="store", type="int", dest="grayscale_resolution", default="1",help="") 
 		
+		# Lowest burning setting
+ 		self.OptionParser.add_option("","--laserpower_LOW", action="store", type="int", dest="laserpower_LOW", default="1", help="Lowest laser point (e.g. when wood starts to go brown)")
+ 		# Highest burning setting
+ 		self.OptionParser.add_option("", "--laserpower_HIGH", action="store", type="int", dest="laserpower_HIGH", default="1000", help="Highest laser power setting")
+		
 		#Velocita Nero e spostamento
 		self.OptionParser.add_option("","--speed_ON",action="store", type="int", dest="speed_ON", default="200",help="") 
 
@@ -174,16 +179,17 @@ class GcodeExport(inkex.Effect):
 		# -d 127 = risoluzione 127DPI  =>  5 pixel/mm  1pixel = 0.2mm
 		###command="inkscape -C -e \"%s\" -b\"%s\" %s -d 127" % (pos_file_png_exported,bg_color,current_file) 
 
-		if self.options.resolution == 1:
-			DPI = 25.4
-		elif self.options.resolution == 2:
-			DPI = 50.8
-		elif self.options.resolution == 5:
-			DPI = 127
-		else:
-			DPI = 254
-
-		command="inkscape -C -e \"%s\" -b\"%s\" %s -d %s" % (pos_file_png_exported,bg_color,current_file,DPI) #Comando da linea di comando per esportare in PNG
+#		if self.options.resolution == 1:
+#			DPI = 25.4
+#		elif self.options.resolution == 2:
+#			DPI = 50.8
+#		elif self.options.resolution == 5:
+#			DPI = 127
+#		else:
+#			DPI = 254
+		DPI = (254 * self.options.resolution) / 10
+		
+		command="inkscape -C -e \"%s\" -b\"%s\" %s -d %d" % (pos_file_png_exported,bg_color,current_file,DPI) #Comando da linea di comando per esportare in PNG
 					
 		p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		return_code = p.wait()
@@ -425,20 +431,18 @@ class GcodeExport(inkex.Effect):
 			file_gcode = open(pos_file_gcode, 'w')  #Creo il file
 			
 			#Configurazioni iniziali standard Gcode
-			file_gcode.write('; Generated with:\n; "Raster 2 Laser Gcode generator"\n; by 305 Engineering\n;\n;\n;\n')
+#			file_gcode.write('; Generated with:\n; "Raster 2 Laser Gcode generator"\n; by 305 Engineering\n;\n;\n;\n')
 			#HOMING
 			if self.options.homing == 1:
-				file_gcode.write('G28; home all axes\n')
+				file_gcode.write('G28\n')
 			elif self.options.homing == 2:
-				file_gcode.write('$H; home all axes\n')
+				file_gcode.write('$H\n')
 			else:
-				pass
-#			file_gcode.write('G21; Set units to millimeters\n')			
-			file_gcode.write('G90; Use absolute coordinates\n')				
-#			file_gcode.write('G92; Coordinate Offset\n')	
-			file_gcode.write('F0; Reset working feed speed\n')
-			file_gcode.write('G0 XO Y0; Coordinate Offset\n')	
-			file_gcode.write(self.options.laseron + ' '+ ' S0; Reset rotational speed of the spindle\n')
+				pass			
+			file_gcode.write('G90\n')
+			file_gcode.write('F0\n')
+			file_gcode.write('G0 XO Y0\n')	
+			file_gcode.write(self.options.laseron + ' '+ ' S0\n')
 			
 			#Creazione del Gcode
 			
@@ -492,8 +496,9 @@ class GcodeExport(inkex.Effect):
 						for x in range(w):
 							if matrice_BN[y][x] != B :
 								if Laser_ON == False :
+									currentLaserPower = ((self.options.laserpower_HIGH - self.options.laserpower_LOW) *  ((255 - matrice_BN[y][x])) / 255) + self.options.laserpower_LOW
 									file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) +'\n')
-									file_gcode.write('G01 F' + str(F_G01) + ' ' + self.options.laseron + ' '+ ' S' + str(255 - matrice_BN[y][x]) +'\n')
+									file_gcode.write('G01 F' + str(F_G01) + ' ' + self.options.laseron + ' '+ ' S' + str(currentLaserPower) +'\n')
 									Laser_ON = True
 									
 								if  Laser_ON == True :   #DEVO evitare di uscire dalla matrice
@@ -509,7 +514,8 @@ class GcodeExport(inkex.Effect):
 											Laser_ON = False
 											
 										elif matrice_BN[y][x] != matrice_BN[y][x+1] :
-											file_gcode.write('G01 X' + str(float(x+1)/Scala) + ' Y' + str(float(y)/Scala) + ' S' + str((255 - matrice_BN[y][x+1]) * 40) +'\n')
+											currentLaserPower = ((self.options.laserpower_HIGH - self.options.laserpower_LOW) *  ((255 - matrice_BN[y][x])) / 255) + self.options.laserpower_LOW
+											file_gcode.write('G01 X' + str(float(x+1)/Scala) + ' Y' + str(float(y)/Scala) + ' S' + str(currentLaserPower) +'\n')
 						
 
 					
@@ -517,8 +523,9 @@ class GcodeExport(inkex.Effect):
 						for x in reversed(range(w)):
 							if matrice_BN[y][x] != B :
 								if Laser_ON == False :
+									currentLaserPower = ((self.options.laserpower_HIGH - self.options.laserpower_LOW) *  ((255 - matrice_BN[y][x])) / 255) + self.options.laserpower_LOW
 									file_gcode.write('G00 X' + str(float(x+1)/Scala) + ' Y' + str(float(y)/Scala) +'\n')
-									file_gcode.write('G01 F' + str(F_G01) + ' ' + self.options.laseron + ' ' + ' S' + str(255 - matrice_BN[y][x]) +'\n')
+									file_gcode.write('G01 F' + str(F_G01) + ' ' + self.options.laseron + ' ' + ' S' + str(currentLaserPower) +'\n')
 									Laser_ON = True
 									
 								if  Laser_ON == True :   #DEVO evitare di uscire dalla matrice
@@ -534,21 +541,14 @@ class GcodeExport(inkex.Effect):
 											Laser_ON = False
 											
 										elif  matrice_BN[y][x] != matrice_BN[y][x-1] :
-											file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' S' + str((255 - matrice_BN[y][x-1]) * 40) +'\n')
+											currentLaserPower = ((self.options.laserpower_HIGH - self.options.laserpower_LOW) *  ((255 - matrice_BN[y][x])) / 255) + self.options.laserpower_LOW
+											file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' S' + str(currentLaserPower) +'\n')
 
 
 			
 			
 			#Configurazioni finali standard Gcode
-			file_gcode.write('G00 X0 Y0; home\n')
-			#HOMING
-#			if self.options.homing == 1:
-#				file_gcode.write('G28; home all axes\n')
-#			elif self.options.homing == 2:
-#				file_gcode.write('$H; home all axes\n')
-#			else:
-#				pass
-			
+			file_gcode.write('G00 X0 Y0\n')
 			file_gcode.close() #Chiudo il file
 
 
