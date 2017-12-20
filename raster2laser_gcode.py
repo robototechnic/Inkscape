@@ -531,12 +531,12 @@ class GcodeExport(inkex.Effect):
 								if  Laser_ON == True :   #DEVO evitare di uscire dalla matrice
 									if x == 0 : #controllo fine riga ritorno
 										file_gcode.write('X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + '\n')
-										file_gcode.write(self.options.laseroff + '\n')
+#										file_gcode.write(self.options.laseroff + '\n')
 										Laser_ON = False
 										
 									else: 
 										if matrice_BN[y][x-1] == B :
-											file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + '\n')
+											file_gcode.write('X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + '\n')
 #											file_gcode.write(self.options.laseroff + '\n')
 											Laser_ON = False
 											
