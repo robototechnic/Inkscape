@@ -122,8 +122,8 @@ class GcodeExport(inkex.Effect):
 
 			#genero i percorsi file da usare
 			
-			#suffix = ""
-			#if self.options.conversion_type == 1:
+			suffix = ""
+			if self.options.conversion_type == 1:
 			#	suffix = "_BWfix_"+str(self.options.BW_threshold)
 			#elif self.options.conversion_type == 2:
 			#	suffix = "_BWrnd"
