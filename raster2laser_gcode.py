@@ -70,9 +70,10 @@ class GcodeExport(inkex.Effect):
 		
 		#Velocita Nero e spostamento
 		self.OptionParser.add_option("","--speed_ON",action="store", type="int", dest="speed_ON", default="200",help="") 
+		self.OptionParser.add_option("","--speed_ID",action="store", type="int", dest="speed_ID", default="200",help="")
 
 		# Mirror Y
-		self.OptionParser.add_option("","--flip_y",action="store", type="inkbool", dest="flip_y", default=False,help="")
+		#self.OptionParser.add_option("","--flip_y",action="store", type="inkbool", dest="flip_y", default=False,help="")
 		
 		# Homing
 		self.OptionParser.add_option("","--homing",action="store", type="int", dest="homing", default="1",help="")
@@ -83,7 +84,7 @@ class GcodeExport(inkex.Effect):
 		
 		
 		# Anteprima = Solo immagine BN 
-		self.OptionParser.add_option("","--preview_only",action="store", type="inkbool", dest="preview_only", default=False,help="") 
+		#self.OptionParser.add_option("","--preview_only",action="store", type="inkbool", dest="preview_only", default=False,help="") 
 
 		#inkex.errormsg("BLA BLA BLA Messaggio da visualizzare") #DEBUG
 
@@ -121,18 +122,18 @@ class GcodeExport(inkex.Effect):
 
 			#genero i percorsi file da usare
 			
-			suffix = ""
-			if self.options.conversion_type == 1:
-				suffix = "_BWfix_"+str(self.options.BW_threshold)
-			elif self.options.conversion_type == 2:
-				suffix = "_BWrnd"
-			elif self.options.conversion_type == 3:
-				suffix = "_H"
-			elif self.options.conversion_type == 4:
-				suffix = "_Hrow"
-			elif self.options.conversion_type == 5:
-				suffix = "_Hcol"
-			else:
+			#suffix = ""
+			#if self.options.conversion_type == 1:
+			#	suffix = "_BWfix_"+str(self.options.BW_threshold)
+			#elif self.options.conversion_type == 2:
+			#	suffix = "_BWrnd"
+			#elif self.options.conversion_type == 3:
+			#	suffix = "_H"
+			#elif self.options.conversion_type == 4:
+			#	suffix = "_Hrow"
+			#elif self.options.conversion_type == 5:
+			#	suffix = "_Hcol"
+			#else:
 				if self.options.grayscale_resolution == 1:
 					suffix = "_Gray_256"
 				elif self.options.grayscale_resolution == 2:
@@ -281,114 +282,114 @@ class GcodeExport(inkex.Effect):
 		
 		
 		if self.options.conversion_type == 1:
-			#B/W fixed threshold
-			soglia = self.options.BW_threshold
-			for y in range(h): 
-				for x in range(w):
-					if matrice[y][x] >= soglia :
-						matrice_BN[y][x] = B
-					else:
-						matrice_BN[y][x] = N
-	
-			
-		elif self.options.conversion_type == 2:
-			#B/W random threshold
-			from random import randint
-			for y in range(h): 
-				for x in range(w): 
-					soglia = randint(20,235)
-					if matrice[y][x] >= soglia :
-						matrice_BN[y][x] = B
-					else:
-						matrice_BN[y][x] = N
-			
-			
-		elif self.options.conversion_type == 3:
-			#Halftone
-			Step1 = [[B,B,B,B,B],[B,B,B,B,B],[B,B,N,B,B],[B,B,B,B,B],[B,B,B,B,B]]
-			Step2 = [[B,B,B,B,B],[B,B,N,B,B],[B,N,N,N,B],[B,B,N,B,B],[B,B,B,B,B]]
-			Step3 = [[B,B,N,B,B],[B,N,N,N,B],[N,N,N,N,N],[B,N,N,N,B],[B,B,N,B,B]]
-			Step4 = [[B,N,N,N,B],[N,N,N,N,N],[N,N,N,N,N],[N,N,N,N,N],[B,N,N,N,B]]
-			
-			for y in range(h/5): 
-				for x in range(w/5): 
-					media = 0
-					for y2 in range(5):
-						for x2 in range(5):
-							media +=  matrice[y*5+y2][x*5+x2]
-					media = media /25
-					for y3 in range(5):
-						for x3 in range(5):
-							if media >= 250 and media <= 255:
-								matrice_BN[y*5+y3][x*5+x3] = 	B	
-							if media >= 190 and media < 250:
-								matrice_BN[y*5+y3][x*5+x3] =	Step1[y3][x3]
-							if media >= 130 and media < 190:
-								matrice_BN[y*5+y3][x*5+x3] =	Step2[y3][x3]
-							if media >= 70 and media < 130:
-								matrice_BN[y*5+y3][x*5+x3] =	Step3[y3][x3]
-							if media >= 10 and media < 70:
-								matrice_BN[y*5+y3][x*5+x3] =	Step4[y3][x3]		
-							if media >= 0 and media < 10:
-								matrice_BN[y*5+y3][x*5+x3] = N
-
-
-		elif self.options.conversion_type == 4:
-			#Halftone row
-			Step1r = [B,B,N,B,B]
-			Step2r = [B,N,N,B,B]
-			Step3r = [B,N,N,N,B]
-			Step4r = [N,N,N,N,B]
-
-			for y in range(h): 
-				for x in range(w/5): 
-					media = 0
-					for x2 in range(5):
-						media +=  matrice[y][x*5+x2]
-					media = media /5
-					for x3 in range(5):
-						if media >= 250 and media <= 255:
-							matrice_BN[y][x*5+x3] = 	B
-						if media >= 190 and media < 250:
-							matrice_BN[y][x*5+x3] =	Step1r[x3]
-						if media >= 130 and media < 190:
-							matrice_BN[y][x*5+x3] =	Step2r[x3]
-						if media >= 70 and media < 130:
-							matrice_BN[y][x*5+x3] =	Step3r[x3]
-						if media >= 10 and media < 70:
-							matrice_BN[y][x*5+x3] =	Step4r[x3]		
-						if media >= 0 and media < 10:
-							matrice_BN[y][x*5+x3] = N			
-
-
-		elif self.options.conversion_type == 5:
-			#Halftone column
-			Step1c = [B,B,N,B,B]
-			Step2c = [B,N,N,B,B]
-			Step3c = [B,N,N,N,B]
-			Step4c = [N,N,N,N,B]
-
-			for y in range(h/5):
-				for x in range(w):
-					media = 0
-					for y2 in range(5):
-						media +=  matrice[y*5+y2][x]
-					media = media /5
-					for y3 in range(5):
-						if media >= 250 and media <= 255:
-							matrice_BN[y*5+y3][x] = 	B
-						if media >= 190 and media < 250:
-							matrice_BN[y*5+y3][x] =	Step1c[y3]
-						if media >= 130 and media < 190:
-							matrice_BN[y*5+y3][x] =	Step2c[y3]
-						if media >= 70 and media < 130:
-							matrice_BN[y*5+y3][x] =	Step3c[y3]
-						if media >= 10 and media < 70:
-							matrice_BN[y*5+y3][x] =	Step4c[y3]		
-						if media >= 0 and media < 10:
-							matrice_BN[y*5+y3][x] = N			
-			
-		else:
+#			#B/W fixed threshold
+#			soglia = self.options.BW_threshold
+#			for y in range(h): 
+#				for x in range(w):
+#					if matrice[y][x] >= soglia :
+#						matrice_BN[y][x] = B
+#					else:
+#						matrice_BN[y][x] = N
+#	
+#			
+#		elif self.options.conversion_type == 2:
+#			#B/W random threshold
+#			from random import randint
+#			for y in range(h): 
+#				for x in range(w): 
+#					soglia = randint(20,235)
+#					if matrice[y][x] >= soglia :
+#						matrice_BN[y][x] = B
+#					else:
+#						matrice_BN[y][x] = N
+#			
+#			
+#		elif self.options.conversion_type == 3:
+#			#Halftone
+#			Step1 = [[B,B,B,B,B],[B,B,B,B,B],[B,B,N,B,B],[B,B,B,B,B],[B,B,B,B,B]]
+#			Step2 = [[B,B,B,B,B],[B,B,N,B,B],[B,N,N,N,B],[B,B,N,B,B],[B,B,B,B,B]]
+#			Step3 = [[B,B,N,B,B],[B,N,N,N,B],[N,N,N,N,N],[B,N,N,N,B],[B,B,N,B,B]]
+#			Step4 = [[B,N,N,N,B],[N,N,N,N,N],[N,N,N,N,N],[N,N,N,N,N],[B,N,N,N,B]]
+#			
+#			for y in range(h/5): 
+#				for x in range(w/5): 
+#					media = 0
+#					for y2 in range(5):
+#						for x2 in range(5):
+#							media +=  matrice[y*5+y2][x*5+x2]
+#					media = media /25
+#					for y3 in range(5):
+#						for x3 in range(5):
+#							if media >= 250 and media <= 255:
+#								matrice_BN[y*5+y3][x*5+x3] = 	B	
+#							if media >= 190 and media < 250:
+#								matrice_BN[y*5+y3][x*5+x3] =	Step1[y3][x3]
+#							if media >= 130 and media < 190:
+#								matrice_BN[y*5+y3][x*5+x3] =	Step2[y3][x3]
+#							if media >= 70 and media < 130:
+#								matrice_BN[y*5+y3][x*5+x3] =	Step3[y3][x3]
+#							if media >= 10 and media < 70:
+#								matrice_BN[y*5+y3][x*5+x3] =	Step4[y3][x3]		
+#							if media >= 0 and media < 10:
+#								matrice_BN[y*5+y3][x*5+x3] = N
+#
+#
+#		elif self.options.conversion_type == 4:
+#			#Halftone row
+#			Step1r = [B,B,N,B,B]
+#			Step2r = [B,N,N,B,B]
+#			Step3r = [B,N,N,N,B]
+#			Step4r = [N,N,N,N,B]
+#
+#			for y in range(h): 
+#				for x in range(w/5): 
+#					media = 0
+#					for x2 in range(5):
+#						media +=  matrice[y][x*5+x2]
+#					media = media /5
+#					for x3 in range(5):
+#						if media >= 250 and media <= 255:
+#							matrice_BN[y][x*5+x3] = 	B
+#						if media >= 190 and media < 250:
+#							matrice_BN[y][x*5+x3] =	Step1r[x3]
+#						if media >= 130 and media < 190:
+#							matrice_BN[y][x*5+x3] =	Step2r[x3]
+#						if media >= 70 and media < 130:
+#							matrice_BN[y][x*5+x3] =	Step3r[x3]
+#						if media >= 10 and media < 70:
+#							matrice_BN[y][x*5+x3] =	Step4r[x3]		
+#						if media >= 0 and media < 10:
+#							matrice_BN[y][x*5+x3] = N			
+#
+#
+#		elif self.options.conversion_type == 5:
+#			#Halftone column
+#			Step1c = [B,B,N,B,B]
+#			Step2c = [B,N,N,B,B]
+#			Step3c = [B,N,N,N,B]
+#			Step4c = [N,N,N,N,B]
+#
+#			for y in range(h/5):
+#				for x in range(w):
+#					media = 0
+#					for y2 in range(5):
+#						media +=  matrice[y*5+y2][x]
+#					media = media /5
+#					for y3 in range(5):
+#						if media >= 250 and media <= 255:
+#							matrice_BN[y*5+y3][x] = 	B
+#						if media >= 190 and media < 250:
+#							matrice_BN[y*5+y3][x] =	Step1c[y3]
+#						if media >= 130 and media < 190:
+#							matrice_BN[y*5+y3][x] =	Step2c[y3]
+#						if media >= 70 and media < 130:
+#							matrice_BN[y*5+y3][x] =	Step3c[y3]
+#						if media >= 10 and media < 70:
+#							matrice_BN[y*5+y3][x] =	Step4c[y3]		
+#						if media >= 0 and media < 10:
+#							matrice_BN[y*5+y3][x] = N			
+#			
+#		else:
 			#Grayscale
 			if self.options.grayscale_resolution == 1:
 				matrice_BN = matrice
@@ -417,14 +418,15 @@ class GcodeExport(inkex.Effect):
 
 
 		#### GENERO IL FILE GCODE ####
-		if self.options.preview_only == False: #Genero Gcode solo se devo
-		
-			if self.options.flip_y == False: #Inverto asse Y solo se flip_y = False     
-				#-> coordinate Cartesiane (False) Coordinate "informatiche" (True)
-				matrice_BN.reverse()				
+#		if self.options.preview_only == False: #Genero Gcode solo se devo
+		if 1 == 1:		
+#			if self.options.flip_y == False: #Inverto asse Y solo se flip_y = False     
+#				#-> coordinate Cartesiane (False) Coordinate "informatiche" (True)
+#				matrice_BN.reverse()				
 
 			
 			Laser_ON = False
+			F_G00 = self.options.speed_ID
 			F_G01 = self.options.speed_ON
 			Scala = self.options.resolution
 
@@ -451,53 +453,54 @@ class GcodeExport(inkex.Effect):
 				matrice_BN[y].append(B)
 			w = w+1
 			
-			if self.options.conversion_type != 6:
-				for y in range(h):
-					if y % 2 == 0 :
-						for x in range(w):
-							if matrice_BN[y][x] == N :
-								if Laser_ON == False :
-									#file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' F' + str(F_G00) + '\n')
-									file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + '\n') #tolto il Feed sul G00
-									file_gcode.write(self.options.laseron + '\n')			
-									Laser_ON = True
-								if  Laser_ON == True :   #DEVO evitare di uscire dalla matrice
-									if x == w-1 :
-										file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) +' F' + str(F_G01) + '\n')
-										file_gcode.write(self.options.laseroff + '\n')
-										Laser_ON = False
-									else: 
-										if matrice_BN[y][x+1] != N :
-											file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' F' + str(F_G01) +'\n')
-											file_gcode.write(self.options.laseroff + '\n')
-											Laser_ON = False
-					else:
-						for x in reversed(range(w)):
-							if matrice_BN[y][x] == N :
-								if Laser_ON == False :
-									#file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' F' + str(F_G00) + '\n')
-									file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + '\n') #tolto il Feed sul G00
-									file_gcode.write(self.options.laseron + '\n')			
-									Laser_ON = True
-								if  Laser_ON == True :   #DEVO evitare di uscire dalla matrice
-									if x == 0 :
-										file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) +' F' + str(F_G01) + '\n')
-										file_gcode.write(self.options.laseroff + '\n')
-										Laser_ON = False
-									else: 
-										if matrice_BN[y][x-1] != N :
-											file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' F' + str(F_G01) +'\n')
-											file_gcode.write(self.options.laseroff + '\n')
-											Laser_ON = False				
-
-			else: ##SCALA DI GRIGI
+#			if self.options.conversion_type != 6:
+#				for y in range(h):
+#					if y % 2 == 0 :
+#						for x in range(w):
+#							if matrice_BN[y][x] == N :
+#								if Laser_ON == False :
+#									#file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' F' + str(F_G00) + '\n')
+#									file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + '\n') #tolto il Feed sul G00
+#									file_gcode.write(self.options.laseron + '\n')			
+#									Laser_ON = True
+#								if  Laser_ON == True :   #DEVO evitare di uscire dalla matrice
+#									if x == w-1 :
+#										file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) +' F' + str(F_G01) + '\n')
+#										file_gcode.write(self.options.laseroff + '\n')
+#										Laser_ON = False
+#									else: 
+#										if matrice_BN[y][x+1] != N :
+#											file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' F' + str(F_G01) +'\n')
+#											file_gcode.write(self.options.laseroff + '\n')
+#											Laser_ON = False
+#					else:
+#						for x in reversed(range(w)):
+#							if matrice_BN[y][x] == N :
+#								if Laser_ON == False :
+#									#file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' F' + str(F_G00) + '\n')
+#									file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + '\n') #tolto il Feed sul G00
+#									file_gcode.write(self.options.laseron + '\n')			
+#									Laser_ON = True
+#								if  Laser_ON == True :   #DEVO evitare di uscire dalla matrice
+#									if x == 0 :
+#										file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) +' F' + str(F_G01) + '\n')
+#										file_gcode.write(self.options.laseroff + '\n')
+#										Laser_ON = False
+#									else: 
+#										if matrice_BN[y][x-1] != N :
+#											file_gcode.write('G01 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' F' + str(F_G01) +'\n')
+#											file_gcode.write(self.options.laseroff + '\n')
+#											Laser_ON = False				
+#
+#			else: ##SCALA DI GRIGI
+			if self.options.conversion_type == 1:
 				for y in range(h):
 					if y % 2 == 0 :
 						for x in range(w):
 							if matrice_BN[y][x] != B :
 								if Laser_ON == False :
 									currentLaserPower = ((self.options.laserpower_HIGH - self.options.laserpower_LOW) *  ((255 - matrice_BN[y][x])) / 255) + self.options.laserpower_LOW
-									file_gcode.write('G00 X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' ' + self.options.laseroff + '\n')
+									file_gcode.write('G01 F' + str(F_G00) + ' X' + str(float(x)/Scala) + ' Y' + str(float(y)/Scala) + ' ' + self.options.laseroff + '\n')
 									file_gcode.write('G01 F' + str(F_G01) + ' ' + self.options.laseron + ' S' + str(currentLaserPower) +'\n')
 									Laser_ON = True
 									
@@ -524,7 +527,7 @@ class GcodeExport(inkex.Effect):
 							if matrice_BN[y][x] != B :
 								if Laser_ON == False :
 									currentLaserPower = ((self.options.laserpower_HIGH - self.options.laserpower_LOW) *  ((255 - matrice_BN[y][x])) / 255) + self.options.laserpower_LOW
-									file_gcode.write('G00 X' + str(float(x+1)/Scala) + ' Y' + str(float(y)/Scala) + ' ' + self.options.laseroff + '\n')
+									file_gcode.write('G01 F' + str(F_G00) + ' X' + str(float(x+1)/Scala) + ' Y' + str(float(y)/Scala) + ' ' + self.options.laseroff + '\n')
 									file_gcode.write('G01 F' + str(F_G01) + ' ' + self.options.laseron + ' S' + str(currentLaserPower) +'\n')
 									Laser_ON = True
 									
