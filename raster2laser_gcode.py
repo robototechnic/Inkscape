@@ -393,17 +393,17 @@ class GcodeExport(inkex.Effect):
 			#Grayscale
 			if self.options.grayscale_resolution == 1:
 				matrice_BN = matrice
-			else:
-				for y in range(h): 
-					for x in range(w): 
-						if matrice[y][x] <= 1:
-							matrice_BN[y][x] == 0
+#			else:
+#				for y in range(h): 
+#					for x in range(w): 
+#						if matrice[y][x] <= 1:
+#							matrice_BN[y][x] == 0
 							
-						if matrice[y][x] >= 254:
-							matrice_BN[y][x] == 255
+#						if matrice[y][x] >= 254:
+#							matrice_BN[y][x] == 255
 						
-						if matrice[y][x] > 1 and matrice[y][x] <254:
-							matrice_BN[y][x] = ( matrice[y][x] // self.options.grayscale_resolution ) * self.options.grayscale_resolution
+#						if matrice[y][x] > 1 and matrice[y][x] <254:
+#							matrice_BN[y][x] = ( matrice[y][x] // self.options.grayscale_resolution ) * self.options.grayscale_resolution
 						
 			
 			
