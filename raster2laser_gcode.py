@@ -63,7 +63,10 @@ class GcodeExport(inkex.Effect):
 		self.OptionParser.add_option("","--BW_threshold",action="store", type="int", dest="BW_threshold", default="128",help="") 
 		self.OptionParser.add_option("","--grayscale_resolution",action="store", type="int", dest="grayscale_resolution", default="1",help="") 
 		
-		# Lowest burning setting
+		# Enable cooling
+ 		self.OptionParser.add_option("","--cooling", action="store", type="inkbool", dest="cooling", default=True,help="Enable cooling")            
+		
+ 		# Lowest burning setting
  		self.OptionParser.add_option("","--laserpower_LOW", action="store", type="int", dest="laserpower_LOW", default="1", help="Lowest laser point (e.g. when wood starts to go brown)")
  		# Highest burning setting
  		self.OptionParser.add_option("", "--laserpower_HIGH", action="store", type="int", dest="laserpower_HIGH", default="1000", help="Highest laser power setting")
@@ -81,7 +84,8 @@ class GcodeExport(inkex.Effect):
 		# Commands
 		self.OptionParser.add_option("","--laseron", action="store", type="string", dest="laseron", default="M03", help="")
 		self.OptionParser.add_option("","--laseroff", action="store", type="string", dest="laseroff", default="M05", help="")
-		
+		# Enable cooling
+		self.OptionParser.add_option("","--cooling", action="store", type="inkbool", dest="cooling", default=True,help="Enable cooling")
 		
 		# Anteprima = Solo immagine BN 
 		#self.OptionParser.add_option("","--preview_only",action="store", type="inkbool", dest="preview_only", default=False,help="") 
@@ -443,7 +447,9 @@ class GcodeExport(inkex.Effect):
 				pass			
 			file_gcode.write('G90\n')
 			file_gcode.write('F0\n')
-			file_gcode.write('G0 XO Y0\n')	
+			file_gcode.write('G0 XO Y0\n')
+			if self.options.cooling :
+				file_gcode.write('M08\n')
 			file_gcode.write(self.options.laseron + ' S0\n\n')
 			
 			#Creazione del Gcode
@@ -551,6 +557,8 @@ class GcodeExport(inkex.Effect):
 			
 			
 			#Configurazioni finali standard Gcode
+			if self.options.cooling :
+				file_gcode.write('M09\n')
 			file_gcode.write('G00 X0 Y0\n')
 			file_gcode.close() #Chiudo il file
 
