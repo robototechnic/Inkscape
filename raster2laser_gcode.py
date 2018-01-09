@@ -63,9 +63,6 @@ class GcodeExport(inkex.Effect):
 		self.OptionParser.add_option("","--BW_threshold",action="store", type="int", dest="BW_threshold", default="128",help="") 
 		self.OptionParser.add_option("","--grayscale_resolution",action="store", type="int", dest="grayscale_resolution", default="1",help="") 
 		
-		# Enable cooling
- 		self.OptionParser.add_option("","--cooling", action="store", type="inkbool", dest="cooling", default=True,help="Enable cooling")            
-		
  		# Lowest burning setting
  		self.OptionParser.add_option("","--laserpower_LOW", action="store", type="int", dest="laserpower_LOW", default="1", help="Lowest laser point (e.g. when wood starts to go brown)")
  		# Highest burning setting
@@ -84,6 +81,7 @@ class GcodeExport(inkex.Effect):
 		# Commands
 		self.OptionParser.add_option("","--laseron", action="store", type="string", dest="laseron", default="M03", help="")
 		self.OptionParser.add_option("","--laseroff", action="store", type="string", dest="laseroff", default="M05", help="")
+		
 		# Enable cooling
 		self.OptionParser.add_option("","--cooling", action="store", type="inkbool", dest="cooling", default=True,help="Enable cooling")
 		
