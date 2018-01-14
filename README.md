@@ -34,12 +34,6 @@ for unix (& mac maybe) change the permission on the file:
 
 - Step 2) Draw or import the image
 
-- Step 3) To run the extension go to: Extension > 305 Engineering > Raster 2 Laser GCode generator
+- Step 3) To run the extension go to: Extension > Raster 2 Laser GCode generator
 
 - Step 4) Play!
-
-
-
-
-#Note
-I have created all the file except for png.py , see that file for details on the license
