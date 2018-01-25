@@ -424,7 +424,7 @@ class GcodeExport(inkex.Effect):
 		if 1 == 1:		
 #			if self.options.flip_y == False: #Inverto asse Y solo se flip_y = False     
 #				#-> coordinate Cartesiane (False) Coordinate "informatiche" (True)
-#				matrice_BN.reverse()				
+			matrice_BN.reverse()				
 
 			
 			Laser_ON = False
